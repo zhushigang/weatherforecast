@@ -1,0 +1,43 @@
+script(src='https://www.gstatic.com/charts/loader.js')
+body
+    div(id="name")
+    div(id="graph")
+
+script(type='text/javascript').
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    var local_data =!{JSON.stringify(data)};
+    document.getElementById("name").innerHTML = "Current weather: "+parseInt(local_data[0][1])+" F  "+local_data[0][4];
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('date', 'Day');
+      data.addColumn('number', 'Minimum temperature');
+
+      data.addColumn('number', 'Maximum temperature with wind speed');
+      data.addColumn({type:'number', role:'annotation'});
+      data.addColumn({type:'string', role:'annotationText'});
+
+      for (var i = 0; i < local_data.length; i++) {
+      	var r = local_data[i];
+      	var sec = r[0];
+      	var d = new Date(0);
+      	d.setUTCSeconds(sec);
+      	r[0] = d;
+      }
+
+      data.addRows(local_data);
+
+      var options = {
+        chart: {
+          title: 'Daily weather forecast',
+          subtitle: 'in degrees Fahrenheit'
+        },
+        width: 1200,
+        height: 300
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('graph'));
+
+      chart.draw(data, options);
+    }
